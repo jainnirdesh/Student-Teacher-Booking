@@ -1033,8 +1033,11 @@ function showNotification(message, type = 'info') {
 
 // Messaging Functions
 function showNewConversationModal() {
+    console.log('showNewConversationModal called');
+    
     // Get all registered teachers dynamically
     const registeredTeachers = getRegisteredTeachers();
+    console.log('Registered teachers for modal:', registeredTeachers);
     
     const teacherOptions = registeredTeachers.map(teacher => 
         `<option value="${teacher.id}">${teacher.name} - ${teacher.subject || teacher.department || 'Teacher'}</option>`
@@ -1093,6 +1096,18 @@ function sendNewConversation() {
     const messageSubject = document.getElementById('messageSubject');
     const messageText = document.getElementById('messageText');
     
+    // Check if elements exist
+    if (!teacherSelect || !messageSubject || !messageText) {
+        console.error('Form elements not found:', {
+            teacherSelect: !!teacherSelect,
+            messageSubject: !!messageSubject,
+            messageText: !!messageText
+        });
+        showNotification('Form elements not found. Please try again.', 'error');
+        return;
+    }
+    
+    // Check if values are filled
     if (!teacherSelect.value || !messageSubject.value.trim() || !messageText.value.trim()) {
         showNotification('Please fill in all fields', 'error');
         return;
