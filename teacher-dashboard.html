@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - EduBook</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="mb-0">
+                <i class="fas fa-chalkboard-teacher me-2"></i>
+                <span class="sidebar-text">Teacher Portal</span>
+            </h4>
+            <button class="btn btn-link p-0" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="#dashboard" class="sidebar-nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#appointments" class="sidebar-nav-link" onclick="showSection('appointments')">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="sidebar-text">Appointments</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#schedule" class="sidebar-nav-link" onclick="showSection('schedule')">
+                    <i class="fas fa-clock"></i>
+                    <span class="sidebar-text">Schedule</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#students" class="sidebar-nav-link" onclick="showSection('students')">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="sidebar-text">Students</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#messages" class="sidebar-nav-link" onclick="showSection('messages')">
+                    <i class="fas fa-envelope"></i>
+                    <span class="sidebar-text">Messages</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#profile" class="sidebar-nav-link" onclick="showSection('profile')">
+                    <i class="fas fa-user"></i>
+                    <span class="sidebar-text">Profile</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="sidebar-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="d-flex align-items-center">
+                <span class="me-3">Welcome, <span id="teacherName">Teacher</span></span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="showSection('profile')">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="content-section">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAppointments">0</div>
+                        <div class="stat-label">Total Appointments</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card warning">
+                        <div class="stat-number" id="pendingAppointments">0</div>
+                        <div class="stat-label">Pending Approval</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card success">
+                        <div class="stat-number" id="todayAppointments">0</div>
+                        <div class="stat-label">Today's Meetings</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card info">
+                        <div class="stat-number" id="totalStudents">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Appointments and Quick Actions -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Appointment Requests</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Student</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Purpose</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentAppointmentsTable">
+                                        <tr>
+                                            <td colspan="5" class="text-center">No recent appointments</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" onclick="showSection('schedule')">
+                                    <i class="fas fa-clock me-2"></i>Manage Schedule
+                                </button>
+                                <button class="btn btn-success" onclick="showSection('appointments')">
+                                    <i class="fas fa-calendar-check me-2"></i>View Appointments
+                                </button>
+                                <button class="btn btn-info" onclick="showSection('messages')">
+                                    <i class="fas fa-envelope me-2"></i>Messages
+                                </button>
+                                <button class="btn btn-warning" onclick="addTimeSlot()">
+                                    <i class="fas fa-plus me-2"></i>Add Time Slot
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="appointments-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Appointment Management</h5>
+                        <select class="form-select w-auto" id="appointmentFilter" onchange="filterAppointments()">
+                            <option value="all">All Appointments</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Date & Time</th>
+                                    <th>Purpose</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center">No appointments found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Schedule Section -->
+        <section id="schedule-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Available Time Slots</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="addTimeSlotForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="dayOfWeek" class="form-label">Day of Week</label>
+                                            <select class="form-select" id="dayOfWeek" required>
+                                                <option value="">Select Day</option>
+                                                <option value="Monday">Monday</option>
+                                                <option value="Tuesday">Tuesday</option>
+                                                <option value="Wednesday">Wednesday</option>
+                                                <option value="Thursday">Thursday</option>
+                                                <option value="Friday">Friday</option>
+                                                <option value="Saturday">Saturday</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="timeSlot" class="form-label">Time Slot</label>
+                                            <input type="time" class="form-control" id="timeSlot" required>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Add Time Slot
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Current Schedule</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="currentSchedule">
+                                <!-- Schedule will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Students Section -->
+        <section id="students-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Students I've Met</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row" id="studentsGrid">
+                        <!-- Students will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Section -->
+        <section id="messages-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Conversations</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="conversationsList" class="list-group list-group-flush">
+                                <!-- Conversations will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0" id="chatHeader">Select a conversation</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="messagesContainer" style="height: 400px; overflow-y: auto;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <p>Select a conversation to start messaging</p>
+                                </div>
+                            </div>
+                            <form id="messageForm" class="mt-3 d-none">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Profile Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="profileName" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="profileName">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profileEmail" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="profileEmail" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profileDepartment" class="form-label">Department</label>
+                                            <input type="text" class="form-control" id="profileDepartment">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="profileSubject" class="form-label">Subject</label>
+                                            <input type="text" class="form-control" id="profileSubject">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profilePhone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="profilePhone">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profileOffice" class="form-label">Office Location</label>
+                                            <input type="text" class="form-control" id="profileOffice">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="profileBio" class="form-label">Bio</label>
+                                    <textarea class="form-control" id="profileBio" rows="3" placeholder="Tell students about yourself..."></textarea>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Update Profile
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Account Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" onclick="changePassword()">
+                                    <i class="fas fa-key me-2"></i>Change Password
+                                </button>
+                                <button class="btn btn-outline-info" onclick="exportSchedule()">
+                                    <i class="fas fa-download me-2"></i>Export Schedule
+                                </button>
+                                <button class="btn btn-outline-success" onclick="setAvailability()">
+                                    <i class="fas fa-calendar me-2"></i>Set Availability
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Appointment Details Modal -->
+    <div class="modal fade" id="appointmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Appointment Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="appointmentModalBody">
+                    <!-- Appointment details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="approveBtn" onclick="updateAppointmentStatus('approved')">
+                        <i class="fas fa-check me-2"></i>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger" id="rejectBtn" onclick="updateAppointmentStatus('rejected')">
+                        <i class="fas fa-times me-2"></i>Reject
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/teacher-dashboard.js"></script>
+</body>
+</html>

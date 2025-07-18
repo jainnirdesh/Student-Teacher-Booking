@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - EduBook</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="mb-0">
+                <i class="fas fa-user-graduate me-2"></i>
+                <span class="sidebar-text">Student Portal</span>
+            </h4>
+            <button class="btn btn-link p-0" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="#dashboard" class="sidebar-nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#search-teachers" class="sidebar-nav-link" onclick="showSection('search-teachers')">
+                    <i class="fas fa-search"></i>
+                    <span class="sidebar-text">Search Teachers</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#book-appointment" class="sidebar-nav-link" onclick="showSection('book-appointment')">
+                    <i class="fas fa-calendar-plus"></i>
+                    <span class="sidebar-text">Book Appointment</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#my-appointments" class="sidebar-nav-link" onclick="showSection('my-appointments')">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="sidebar-text">My Appointments</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#messages" class="sidebar-nav-link" onclick="showSection('messages')">
+                    <i class="fas fa-envelope"></i>
+                    <span class="sidebar-text">Messages</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#profile" class="sidebar-nav-link" onclick="showSection('profile')">
+                    <i class="fas fa-user"></i>
+                    <span class="sidebar-text">Profile</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="sidebar-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 id="pageTitle">Dashboard</h1>
+            <div class="d-flex align-items-center">
+                <span class="me-3">Welcome, <span id="studentName">Student</span></span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="showSection('profile')">
+                            <i class="fas fa-user me-2"></i>Profile
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="content-section">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalAppointments">0</div>
+                        <div class="stat-label">Total Appointments</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card success">
+                        <div class="stat-number" id="approvedAppointments">0</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card warning">
+                        <div class="stat-number" id="pendingAppointments">0</div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card danger">
+                        <div class="stat-number" id="upcomingAppointments">0</div>
+                        <div class="stat-label">Upcoming</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Appointments -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Appointments</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Teacher</th>
+                                            <th>Date</th>
+                                            <th>Time</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentAppointmentsTable">
+                                        <tr>
+                                            <td colspan="5" class="text-center">No appointments found</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" onclick="showSection('search-teachers')">
+                                    <i class="fas fa-search me-2"></i>Search Teachers
+                                </button>
+                                <button class="btn btn-success" onclick="showSection('book-appointment')">
+                                    <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                                </button>
+                                <button class="btn btn-info" onclick="showSection('messages')">
+                                    <i class="fas fa-envelope me-2"></i>Messages
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Teachers Section -->
+        <section id="search-teachers-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Search Teachers</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Search Form -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <input type="text" class="form-control" id="searchName" placeholder="Teacher Name">
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="searchDepartment">
+                                <option value="">All Departments</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="searchSubject">
+                                <option value="">All Subjects</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary w-100" onclick="searchTeachers()">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Search Results -->
+                    <div id="teacherSearchResults">
+                        <div class="text-center">
+                            <p class="text-muted">Use the search form above to find teachers</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Book Appointment Section -->
+        <section id="book-appointment-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Book New Appointment</h5>
+                </div>
+                <div class="card-body">
+                    <form id="bookAppointmentForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="teacherSelect" class="form-label">Select Teacher</label>
+                                    <select class="form-select" id="teacherSelect" required>
+                                        <option value="">Choose a teacher...</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentDate" class="form-label">Preferred Date</label>
+                                    <input type="date" class="form-control" id="appointmentDate" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentTime" class="form-label">Preferred Time</label>
+                                    <select class="form-select" id="appointmentTime" required>
+                                        <option value="">Select time slot...</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="appointmentPurpose" class="form-label">Purpose of Meeting</label>
+                                    <textarea class="form-control" id="appointmentPurpose" rows="3" placeholder="Describe the purpose of your appointment"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="appointmentMessage" class="form-label">Additional Message</label>
+                                    <textarea class="form-control" id="appointmentMessage" rows="4" placeholder="Any additional information..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <button type="button" class="btn btn-secondary me-2" onclick="resetAppointmentForm()">Reset</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- My Appointments Section -->
+        <section id="my-appointments-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">My Appointments</h5>
+                        <div>
+                            <select class="form-select" id="appointmentFilter" onchange="filterAppointments()">
+                                <option value="all">All Appointments</option>
+                                <option value="pending">Pending</option>
+                                <option value="approved">Approved</option>
+                                <option value="rejected">Rejected</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Teacher</th>
+                                    <th>Date & Time</th>
+                                    <th>Purpose</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center">No appointments found</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages Section -->
+        <section id="messages-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Conversations</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <div id="conversationsList" class="list-group list-group-flush">
+                                <!-- Conversations will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0" id="chatHeader">Select a conversation</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="messagesContainer" style="height: 400px; overflow-y: auto;">
+                                <div class="text-center text-muted">
+                                    <i class="fas fa-comments fa-3x mb-3"></i>
+                                    <p>Select a conversation to start messaging</p>
+                                </div>
+                            </div>
+                            <form id="messageForm" class="mt-3 d-none">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Section -->
+        <section id="profile-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Profile Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="profileForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="profileName" class="form-label">Full Name</label>
+                                            <input type="text" class="form-control" id="profileName">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profileEmail" class="form-label">Email</label>
+                                            <input type="email" class="form-control" id="profileEmail" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profileStudentId" class="form-label">Student ID</label>
+                                            <input type="text" class="form-control" id="profileStudentId">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="profileProgram" class="form-label">Program</label>
+                                            <input type="text" class="form-control" id="profileProgram">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="profilePhone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="profilePhone">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Update Profile
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Account Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-outline-primary" onclick="changePassword()">
+                                    <i class="fas fa-key me-2"></i>Change Password
+                                </button>
+                                <button class="btn btn-outline-info" onclick="downloadData()">
+                                    <i class="fas fa-download me-2"></i>Download My Data
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="deleteAccount()">
+                                    <i class="fas fa-trash me-2"></i>Delete Account
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/student-dashboard.js"></script>
+</body>
+</html>

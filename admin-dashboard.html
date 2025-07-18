@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - EduBook</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dashboard">
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <h4 class="mb-0">
+                <i class="fas fa-shield-alt me-2"></i>
+                <span class="sidebar-text">Admin Portal</span>
+            </h4>
+            <button class="btn btn-link p-0" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+                <a href="#dashboard" class="sidebar-nav-link active" onclick="showSection('dashboard')">
+                    <i class="fas fa-chart-line"></i>
+                    <span class="sidebar-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#users" class="sidebar-nav-link" onclick="showSection('users')">
+                    <i class="fas fa-users"></i>
+                    <span class="sidebar-text">User Management</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#teachers" class="sidebar-nav-link" onclick="showSection('teachers')">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span class="sidebar-text">Teachers</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#students" class="sidebar-nav-link" onclick="showSection('students')">
+                    <i class="fas fa-user-graduate"></i>
+                    <span class="sidebar-text">Students</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#appointments" class="sidebar-nav-link" onclick="showSection('appointments')">
+                    <i class="fas fa-calendar-check"></i>
+                    <span class="sidebar-text">Appointments</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#analytics" class="sidebar-nav-link" onclick="showSection('analytics')">
+                    <i class="fas fa-chart-bar"></i>
+                    <span class="sidebar-text">Analytics</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#logs" class="sidebar-nav-link" onclick="showSection('logs')">
+                    <i class="fas fa-list-alt"></i>
+                    <span class="sidebar-text">Activity Logs</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#settings" class="sidebar-nav-link" onclick="showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span class="sidebar-text">Settings</span>
+                </a>
+            </li>
+            <li class="sidebar-nav-item">
+                <a href="#" class="sidebar-nav-link" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="sidebar-text">Logout</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 id="pageTitle">Admin Dashboard</h1>
+            <div class="d-flex align-items-center">
+                <span class="me-3">Welcome, <span id="adminName">Administrator</span></span>
+                <div class="dropdown">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="showSection('settings')">
+                            <i class="fas fa-cog me-2"></i>Settings
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" onclick="logout()">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="content-section">
+            <!-- Statistics Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card success">
+                        <div class="stat-number" id="totalTeachers">0</div>
+                        <div class="stat-label">Teachers</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card info">
+                        <div class="stat-number" id="totalStudents">0</div>
+                        <div class="stat-label">Students</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="stat-card warning">
+                        <div class="stat-number" id="totalAppointments">0</div>
+                        <div class="stat-label">Appointments</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts and Recent Activity -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Overview</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>User Registration Trends</h6>
+                                    <canvas id="userRegistrationChart" width="300" height="200"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Appointment Status Distribution</h6>
+                                    <canvas id="appointmentStatusChart" width="300" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Recent Activity</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="recentActivity">
+                                <!-- Recent activities will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-primary" onclick="showSection('teachers')">
+                                    <i class="fas fa-plus me-2"></i>Add Teacher
+                                </button>
+                                <button class="btn btn-success" onclick="showSection('users')">
+                                    <i class="fas fa-check me-2"></i>Approve Users
+                                </button>
+                                <button class="btn btn-info" onclick="exportData()">
+                                    <i class="fas fa-download me-2"></i>Export Data
+                                </button>
+                                <button class="btn btn-warning" onclick="systemMaintenance()">
+                                    <i class="fas fa-wrench me-2"></i>Maintenance
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Management Section -->
+        <section id="users-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">User Management</h5>
+                        <div class="d-flex gap-2">
+                            <select class="form-select w-auto" id="userRoleFilter" onchange="filterUsers()">
+                                <option value="all">All Roles</option>
+                                <option value="student">Students</option>
+                                <option value="teacher">Teachers</option>
+                                <option value="admin">Admins</option>
+                            </select>
+                            <select class="form-select w-auto" id="userStatusFilter" onchange="filterUsers()">
+                                <option value="all">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="pending">Pending Approval</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Registered</th>
+                                    <th>Last Login</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTable">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading users...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Teachers Section -->
+        <section id="teachers-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Teacher Management</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Teacher</th>
+                                            <th>Department</th>
+                                            <th>Subject</th>
+                                            <th>Appointments</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="teachersTable">
+                                        <tr>
+                                            <td colspan="6" class="text-center">Loading teachers...</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Add New Teacher</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="addTeacherForm">
+                                <div class="mb-3">
+                                    <label for="teacherName" class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" id="teacherName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="teacherEmail" class="form-label">Email</label>
+                                    <input type="email" class="form-control" id="teacherEmail" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="teacherDepartment" class="form-label">Department</label>
+                                    <input type="text" class="form-control" id="teacherDepartment" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="teacherSubject" class="form-label">Subject</label>
+                                    <input type="text" class="form-control" id="teacherSubject" required>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-plus me-2"></i>Add Teacher
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Students Section -->
+        <section id="students-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Student Management</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Student ID</th>
+                                    <th>Program</th>
+                                    <th>Appointments</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTable">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading students...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="appointments-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Appointment Overview</h5>
+                        <select class="form-select w-auto" id="appointmentStatusFilter" onchange="filterAppointments()">
+                            <option value="all">All Appointments</option>
+                            <option value="pending">Pending</option>
+                            <option value="approved">Approved</option>
+                            <option value="rejected">Rejected</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Teacher</th>
+                                    <th>Date & Time</th>
+                                    <th>Purpose</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsTable">
+                                <tr>
+                                    <td colspan="6" class="text-center">Loading appointments...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section id="analytics-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-12 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Analytics</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Daily Appointments</h6>
+                                    <canvas id="dailyAppointmentsChart" width="400" height="200"></canvas>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Department Distribution</h6>
+                                    <canvas id="departmentChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Top Teachers</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="topTeachers">
+                                <!-- Top teachers will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Performance</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="systemPerformance">
+                                <!-- Performance metrics will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Activity Logs Section -->
+        <section id="logs-section" class="content-section d-none">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Activity Logs</h5>
+                        <div class="d-flex gap-2">
+                            <input type="date" class="form-control" id="logDateFilter" onchange="filterLogs()">
+                            <select class="form-select" id="logActionFilter" onchange="filterLogs()">
+                                <option value="all">All Actions</option>
+                                <option value="USER_REGISTERED">Registrations</option>
+                                <option value="USER_SIGNED_IN">Sign Ins</option>
+                                <option value="APPOINTMENT_BOOKED">Bookings</option>
+                                <option value="APPOINTMENT_STATUS_UPDATED">Status Updates</option>
+                            </select>
+                            <button class="btn btn-outline-primary" onclick="exportLogs()">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Action</th>
+                                    <th>Details</th>
+                                    <th>IP Address</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logsTable">
+                                <tr>
+                                    <td colspan="5" class="text-center">Loading activity logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings-section" class="content-section d-none">
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Settings</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="systemSettingsForm">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="systemName" class="form-label">System Name</label>
+                                            <input type="text" class="form-control" id="systemName" value="EduBook">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="maxAppointmentsPerDay" class="form-label">Max Appointments Per Day</label>
+                                            <input type="number" class="form-control" id="maxAppointmentsPerDay" value="10">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="appointmentDuration" class="form-label">Default Appointment Duration (minutes)</label>
+                                            <input type="number" class="form-control" id="appointmentDuration" value="30">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="workingHours" class="form-label">Working Hours</label>
+                                            <input type="text" class="form-control" id="workingHours" value="9:00 AM - 5:00 PM">
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="autoApproveStudents" checked>
+                                                <label class="form-check-label" for="autoApproveStudents">
+                                                    Auto-approve student registrations
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="emailNotifications" checked>
+                                                <label class="form-check-label" for="emailNotifications">
+                                                    Enable email notifications
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Settings
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">System Maintenance</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-warning" onclick="clearCache()">
+                                    <i class="fas fa-trash me-2"></i>Clear Cache
+                                </button>
+                                <button class="btn btn-info" onclick="backupDatabase()">
+                                    <i class="fas fa-database me-2"></i>Backup Database
+                                </button>
+                                <button class="btn btn-success" onclick="sendSystemNotification()">
+                                    <i class="fas fa-bell me-2"></i>Send Notification
+                                </button>
+                                <button class="btn btn-danger" onclick="maintenanceMode()">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>Maintenance Mode
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- User Details Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">User Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="userModalBody">
+                    <!-- User details will be loaded here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="approveUserBtn" onclick="approveUser()">
+                        <i class="fas fa-check me-2"></i>Approve
+                    </button>
+                    <button type="button" class="btn btn-danger" id="suspendUserBtn" onclick="suspendUser()">
+                        <i class="fas fa-ban me-2"></i>Suspend
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/auth.js"></script>
+    <script type="module" src="js/admin-dashboard.js"></script>
+</body>
+</html>
