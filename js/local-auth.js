@@ -167,6 +167,28 @@ class LocalAuthManager {
         return { success: true, user: updatedUser };
     }
 
+    // Update current user directly
+    updateCurrentUser(updatedData) {
+        if (!this.currentUser) {
+            return { success: false, error: 'No user logged in' };
+        }
+
+        const users = this.getUsers();
+        const userIndex = users.findIndex(u => u.id === this.currentUser.id);
+        
+        if (userIndex !== -1) {
+            users[userIndex] = { ...users[userIndex], ...updatedData };
+            this.saveUsers(users);
+        }
+
+        // Update current user in session
+        const updatedUser = { ...this.currentUser, ...updatedData };
+        this.saveCurrentUser(updatedUser);
+        this.currentUser = updatedUser;
+
+        return { success: true, user: updatedUser };
+    }
+
     // Show login modal
     showLoginModal() {
         const modal = this.createLoginModal();
@@ -198,7 +220,8 @@ class LocalAuthManager {
         `;
 
         modal.innerHTML = `
-            <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px;">
+            <div class="modal-content" style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative;">
+                <button class="modal-close" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #999; line-height: 1;">&times;</button>
                 <h2 style="margin-top: 0;">Login</h2>
                 <form id="loginForm">
                     <div style="margin-bottom: 1rem;">
@@ -211,12 +234,38 @@ class LocalAuthManager {
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" style="flex: 1; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">Login</button>
-                        <button type="button" onclick="this.closest('div').parentElement.remove()" style="flex: 1; padding: 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                        <button type="button" class="cancel-btn" style="flex: 1; padding: 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
                     </div>
                 </form>
                 <div id="loginError" style="color: red; margin-top: 1rem; display: none;"></div>
             </div>
         `;
+
+        // Handle close button click
+        modal.querySelector('.modal-close').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Handle cancel button click
+        modal.querySelector('.cancel-btn').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Handle click outside modal to close
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Handle ESC key to close
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                modal.remove();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
 
         // Handle form submission
         modal.querySelector('#loginForm').addEventListener('submit', (e) => {
@@ -255,7 +304,8 @@ class LocalAuthManager {
         `;
 
         modal.innerHTML = `
-            <div style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px;">
+            <div class="modal-content" style="background: white; padding: 2rem; border-radius: 8px; width: 90%; max-width: 400px; position: relative;">
+                <button class="modal-close" style="position: absolute; top: 10px; right: 15px; background: none; border: none; font-size: 24px; cursor: pointer; color: #999; line-height: 1;">&times;</button>
                 <h2 style="margin-top: 0;">Register</h2>
                 <form id="registerForm">
                     <div style="margin-bottom: 1rem;">
@@ -284,12 +334,38 @@ class LocalAuthManager {
                     </div>
                     <div style="display: flex; gap: 1rem;">
                         <button type="submit" style="flex: 1; padding: 0.75rem; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">Register</button>
-                        <button type="button" onclick="this.closest('div').parentElement.remove()" style="flex: 1; padding: 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
+                        <button type="button" class="cancel-btn" style="flex: 1; padding: 0.75rem; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Cancel</button>
                     </div>
                 </form>
                 <div id="registerError" style="color: red; margin-top: 1rem; display: none;"></div>
             </div>
         `;
+
+        // Handle close button click
+        modal.querySelector('.modal-close').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Handle cancel button click
+        modal.querySelector('.cancel-btn').addEventListener('click', () => {
+            modal.remove();
+        });
+
+        // Handle click outside modal to close
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+            }
+        });
+
+        // Handle ESC key to close
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                modal.remove();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
 
         // Handle form submission
         modal.querySelector('#registerForm').addEventListener('submit', (e) => {
