@@ -1,11 +1,5 @@
-import { auth, db } from './firebase-config.js';
-import { 
-    createUserWithEmailAndPassword, 
-    signInWithEmailAndPassword, 
-    signOut, 
-    onAuthStateChanged,
-    sendPasswordResetEmail 
-} from 'firebase/auth';
+import { clerk, ClerkUtils } from './clerk-config.js';
+import { db } from './firebase-config.js';
 import { 
     doc, 
     setDoc, 
@@ -26,28 +20,165 @@ class AuthManager {
 
     // Initialize authentication state listener
     initAuthStateListener() {
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
+        // Listen for Clerk authentication state changes
+        if (typeof window !== 'undefined') {
+            window.addEventListener('clerkUserSignedIn', async (event) => {
+                const user = event.detail;
                 this.currentUser = user;
                 await this.loadUserProfile();
                 this.redirectToDashboard();
-                this.logger.info('User authenticated', { userId: user.uid });
-            } else {
+                this.logger.info('User authenticated', { userId: user.id });
+            });
+
+            window.addEventListener('clerkUserSignedOut', () => {
                 this.currentUser = null;
                 this.userRole = null;
                 this.redirectToLogin();
                 this.logger.info('User signed out');
-            }
-        });
+            });
+
+            // Check initial auth state
+            this.checkInitialAuthState();
+        }
     }
 
-    // Register new user
+    // Check initial authentication state
+    async checkInitialAuthState() {
+        try {
+            // Wait for Clerk to load
+            await new Promise(resolve => {
+                const checkClerk = () => {
+                    if (clerk?.loaded) {
+                        resolve();
+                    } else {
+                        setTimeout(checkClerk, 100);
+                    }
+                };
+                checkClerk();
+            });
+
+            const user = ClerkUtils.getCurrentUser();
+            if (user) {
+                this.currentUser = user;
+                await this.loadUserProfile();
+                this.redirectToDashboard();
+            }
+        } catch (error) {
+            this.logger.error('Error checking initial auth state', error);
+        }
+    }
+
+    // Register new user - now handled by Clerk UI
     async register(userData) {
         try {
             this.showLoading();
             this.logger.info('Attempting user registration', { email: userData.email, role: userData.role });
 
-            // Create user account
+            // Open Clerk sign up modal
+            ClerkUtils.openSignUp();
+
+            // Note: Actual registration is handled by Clerk
+            // We'll create the user profile after successful registration
+            return {
+                success: true,
+                message: 'Please complete registration in the sign-up modal'
+            };
+
+        } catch (error) {
+            this.logger.error('Registration error', error);
+            return {
+                success: false,
+                message: this.getErrorMessage(error)
+            };
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Login user - now handled by Clerk UI
+    async login(credentials) {
+        try {
+            this.showLoading();
+            this.logger.info('Attempting user login', { email: credentials.email });
+
+            // Open Clerk sign in modal
+            ClerkUtils.openSignIn();
+
+            return {
+                success: true,
+                message: 'Please complete login in the sign-in modal'
+            };
+
+        } catch (error) {
+            this.logger.error('Login error', error);
+            return {
+                success: false,
+                message: this.getErrorMessage(error)
+            };
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Logout user
+    async logout() {
+        try {
+            this.showLoading();
+            this.logger.info('User logout initiated');
+
+            await ClerkUtils.signOut();
+
+            return {
+                success: true,
+                message: 'Logged out successfully'
+            };
+
+        } catch (error) {
+            this.logger.error('Logout error', error);
+            return {
+                success: false,
+                message: this.getErrorMessage(error)
+            };
+        } finally {
+            this.hideLoading();
+        }
+    }
+
+    // Create user profile after successful registration
+    async createUserProfile(userData) {
+        try {
+            const user = ClerkUtils.getCurrentUser();
+            if (!user) throw new Error('No authenticated user');
+
+            const userProfile = {
+                uid: user.id,
+                email: user.primaryEmailAddress?.emailAddress,
+                name: userData.name || user.fullName,
+                role: userData.role || 'student',
+                phone: userData.phone || user.primaryPhoneNumber?.phoneNumber,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+                isActive: true,
+                ...userData
+            };
+
+            // Save to Firestore
+            await setDoc(doc(db, 'users', user.id), userProfile);
+
+            // Update Clerk user metadata
+            await ClerkUtils.updateUserMetadata({ 
+                role: userData.role,
+                profileCreated: true 
+            });
+
+            this.logger.info('User profile created', { userId: user.id, role: userData.role });
+            return userProfile;
+
+        } catch (error) {
+            this.logger.error('Error creating user profile', error);
+            throw error;
+        }
+    }
             const userCredential = await createUserWithEmailAndPassword(
                 auth, 
                 userData.email, 
