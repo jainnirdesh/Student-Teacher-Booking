@@ -1,4 +1,5 @@
 import authManager from './auth.js';
+import { ClerkUtils } from './clerk-config.js';
 import { Logger } from './logger.js';
 
 // Initialize logger
@@ -35,29 +36,14 @@ function initializeApp() {
 }
 
 function initializeModals() {
-    // Initialize Bootstrap modals
+    // Initialize Bootstrap modals (keeping for backward compatibility)
     loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
     registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-    
-    // Role change handler for registration
-    const registerRoleSelect = document.getElementById('registerRole');
-    if (registerRoleSelect) {
-        registerRoleSelect.addEventListener('change', handleRoleChange);
-    }
 }
 
 function initializeFormHandlers() {
-    // Login form handler
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-    }
-    
-    // Register form handler
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        registerForm.addEventListener('submit', handleRegister);
-    }
+    // Form handlers are now handled by Clerk
+    logger.info('Form handlers initialized - using Clerk authentication');
 }
 
 function initializeUIComponents() {
@@ -245,13 +231,13 @@ function showNotification(message, type = 'info') {
 
 // Global functions for modal control
 window.showLoginModal = function() {
-    loginModal.show();
     logger.logUserAction('LOGIN_MODAL_OPENED');
+    ClerkUtils.openSignIn();
 };
 
 window.showRegisterModal = function() {
-    registerModal.show();
     logger.logUserAction('REGISTER_MODAL_OPENED');
+    ClerkUtils.openSignUp();
 };
 
 // Global logout function
