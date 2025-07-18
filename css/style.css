@@ -1140,3 +1140,43 @@ body {
     -webkit-align-items: center;
     align-items: center;
 }
+
+/* Safari-specific CSS */
+.safari-browser .sidebar {
+    display: block !important;
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 300px !important;
+    height: 100vh !important;
+    z-index: 1050 !important;
+    background: #ffffff !important;
+    border-right: 2px solid #e2e8f0 !important;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1) !important;
+    overflow-y: auto !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+}
+
+.safari-browser .main-content {
+    margin-left: 300px !important;
+    padding: 2rem !important;
+}
+
+/* Ensure all child elements are visible in Safari */
+.safari-browser .sidebar * {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.safari-browser .sidebar-nav-link {
+    display: block !important;
+    padding: 1rem !important;
+    color: #334155 !important;
+    text-decoration: none !important;
+}
+
+.safari-browser .sidebar-nav-link:hover {
+    background-color: #f1f5f9 !important;
+}
