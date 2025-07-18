@@ -1094,24 +1094,48 @@ function sendNewConversation() {
     const messageText = document.getElementById('messageText');
     
     if (!teacherSelect.value || !messageSubject.value.trim() || !messageText.value.trim()) {
-        alert('Please fill in all fields');
+        showNotification('Please fill in all fields', 'error');
         return;
     }
     
     try {
-        // Simulate sending message
-        console.log('New conversation started:', {
-            teacher: teacherSelect.value,
+        // Get the selected teacher's information
+        const registeredTeachers = getRegisteredTeachers();
+        const selectedTeacher = registeredTeachers.find(t => t.id === teacherSelect.value);
+        
+        if (!selectedTeacher) {
+            showNotification('Selected teacher not found', 'error');
+            return;
+        }
+        
+        // Create conversation object
+        const conversation = {
+            id: 'conv_' + Date.now(),
+            teacherId: selectedTeacher.id,
+            teacherName: selectedTeacher.name,
+            teacherEmail: selectedTeacher.email,
+            teacherSubject: selectedTeacher.subject,
             subject: messageSubject.value,
-            message: messageText.value
-        });
+            createdAt: new Date().toISOString(),
+            lastMessage: {
+                text: messageText.value,
+                sender: 'student',
+                timestamp: new Date().toISOString()
+            },
+            studentId: currentUser?.id || 'student-1'
+        };
+        
+        // Save to localStorage (in real app, this would be saved to database)
+        const existingConversations = JSON.parse(localStorage.getItem('studentConversations') || '[]');
+        existingConversations.unshift(conversation); // Add to beginning
+        localStorage.setItem('studentConversations', JSON.stringify(existingConversations));
         
         // Close modal
         const modal = bootstrap.Modal.getInstance(document.querySelector('.modal'));
         modal.hide();
         
         // Show success message
-        showNotification('Message sent successfully!', 'success');
+        showNotification(`Message sent to ${selectedTeacher.name}!`, 'success');
         
         // Refresh conversations (in a real app, this would update the conversation list)
         setTimeout(() => {
@@ -1120,7 +1144,8 @@ function sendNewConversation() {
         
         if (dashboardLogger) {
             dashboardLogger.logUserAction('NEW_CONVERSATION_STARTED', { 
-                teacher: teacherSelect.value,
+                teacherId: selectedTeacher.id,
+                teacherName: selectedTeacher.name,
                 subject: messageSubject.value 
             });
         }
@@ -1328,3 +1353,62 @@ function ensureSafariCompatibility() {
 
 // Apply Safari-specific fixes on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', applySafariSpecificFixes);
+
+// Function to get all registered teachers from the system
+function getRegisteredTeachers() {
+    try {
+        // Get users from localStorage using the correct key that the auth system uses
+        const users = JSON.parse(localStorage.getItem('edubook_users') || '[]');
+        
+        console.log('All users from storage:', users); // Debug log
+        
+        // Filter only teachers
+        const teachers = users.filter(user => user.role === 'teacher');
+        
+        console.log('Filtered teachers:', teachers); // Debug log
+        
+        // Map to a consistent format
+        return teachers.map(teacher => ({
+            id: teacher.id || teacher.email,
+            name: `${teacher.firstName || ''} ${teacher.lastName || ''}`.trim() || teacher.name || 'Unknown Teacher',
+            email: teacher.email,
+            subject: teacher.subject || teacher.department || teacher.specialization || 'Teacher',
+            department: teacher.department
+        }));
+    } catch (error) {
+        console.error('Error loading registered teachers:', error);
+        
+        // Fallback: try the old 'users' key as well
+        try {
+            const fallbackUsers = JSON.parse(localStorage.getItem('users') || '[]');
+            const fallbackTeachers = fallbackUsers.filter(user => user.role === 'teacher');
+            
+            if (fallbackTeachers.length > 0) {
+                return fallbackTeachers.map(teacher => ({
+                    id: teacher.id || teacher.email,
+                    name: teacher.name || teacher.fullName || 'Unknown Teacher',
+                    email: teacher.email,
+                    subject: teacher.subject || teacher.department || teacher.specialization || 'Teacher',
+                    department: teacher.department
+                }));
+            }
+        } catch (fallbackError) {
+            console.error('Fallback loading also failed:', fallbackError);
+        }
+        
+        // Final fallback: return current user if they're a teacher (for testing)
+        if (window.localAuthManager) {
+            const currentUser = window.localAuthManager.getCurrentUser();
+            if (currentUser && currentUser.role === 'teacher') {
+                return [{
+                    id: currentUser.id || currentUser.email,
+                    name: `${currentUser.firstName || ''} ${currentUser.lastName || ''}`.trim() || currentUser.name || 'Current Teacher',
+                    email: currentUser.email,
+                    subject: currentUser.subject || currentUser.department || 'Teacher'
+                }];
+            }
+        }
+        
+        return [];
+    }
+}
