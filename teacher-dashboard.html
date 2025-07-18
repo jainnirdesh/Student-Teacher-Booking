@@ -9,61 +9,64 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="dashboard">
-    <!-- Sidebar -->
+    <!-- Professional Sidebar - Always Expanded -->
     <nav class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <h4 class="mb-0">
-                <i class="fas fa-chalkboard-teacher me-2"></i>
-                <span class="sidebar-text">Teacher Portal</span>
-            </h4>
-            <button class="btn btn-link p-0" onclick="toggleSidebar()">
-                <i class="fas fa-bars"></i>
-            </button>
+            <a href="#" class="sidebar-brand">
+                <i class="fas fa-chalkboard-teacher"></i>
+                <span class="sidebar-brand-text">Teacher Portal</span>
+            </a>
         </div>
         <ul class="sidebar-nav">
             <li class="sidebar-nav-item">
                 <a href="#dashboard" class="sidebar-nav-link active" onclick="showSection('dashboard')">
                     <i class="fas fa-chart-line"></i>
-                    <span class="sidebar-text">Dashboard</span>
+                    <span class="nav-text">Dashboard</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="#appointments" class="sidebar-nav-link" onclick="showSection('appointments')">
                     <i class="fas fa-calendar-check"></i>
-                    <span class="sidebar-text">Appointments</span>
+                    <span class="nav-text">Appointments</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="#schedule" class="sidebar-nav-link" onclick="showSection('schedule')">
                     <i class="fas fa-clock"></i>
-                    <span class="sidebar-text">Schedule</span>
+                    <span class="nav-text">Schedule</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="#students" class="sidebar-nav-link" onclick="showSection('students')">
                     <i class="fas fa-user-graduate"></i>
-                    <span class="sidebar-text">Students</span>
+                    <span class="nav-text">Students</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="#messages" class="sidebar-nav-link" onclick="showSection('messages')">
                     <i class="fas fa-envelope"></i>
-                    <span class="sidebar-text">Messages</span>
+                    <span class="nav-text">Messages</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="#profile" class="sidebar-nav-link" onclick="showSection('profile')">
                     <i class="fas fa-user"></i>
-                    <span class="sidebar-text">Profile</span>
+                    <span class="nav-text">Profile</span>
                 </a>
             </li>
             <li class="sidebar-nav-item">
                 <a href="#" class="sidebar-nav-link" onclick="logout()">
                     <i class="fas fa-sign-out-alt"></i>
-                    <span class="sidebar-text">Logout</span>
+                    <span class="nav-text">Logout</span>
                 </a>
             </li>
         </ul>
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-content">
+                <i class="fas fa-circle"></i>
+                <span class="sidebar-footer-text">Online</span>
+            </div>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -287,8 +290,11 @@
             <div class="row">
                 <div class="col-lg-4">
                     <div class="card">
-                        <div class="card-header">
+                        <div class="card-header d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Conversations</h5>
+                            <button class="btn btn-primary btn-sm" onclick="showNewConversationModal()">
+                                <i class="fas fa-plus me-1"></i>New Chat
+                            </button>
                         </div>
                         <div class="card-body p-0">
                             <div id="conversationsList" class="list-group list-group-flush">
@@ -436,6 +442,6 @@
     <script src="js/logger.js"></script>
     <script src="js/local-auth.js"></script>
     <script src="js/local-data-manager.js"></script>
-    <script type="module" src="js/teacher-dashboard.js"></script>
+    <script src="js/teacher-dashboard-local.js"></script>
 </body>
 </html>
