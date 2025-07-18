@@ -1,16 +1,52 @@
-import authManager from './auth.js';
-import { ClerkUtils } from './clerk-config.js';
-import { Logger } from './logger.js';
+// Main application functionality
+// Uses localStorage-based authentication
 
-// Initialize logger
-const logger = new Logger('MainApp');
+console.log('=== MAIN.JS LOADING ===');
+
+// Define global functions IMMEDIATELY - before any other code
+window.showLoginModal = function() {
+    console.log('showLoginModal called');
+    if (window.localAuthManager) {
+        window.localAuthManager.showLoginModal();
+    } else {
+        console.error('localAuthManager not available');
+    }
+};
+
+window.showRegisterModal = function() {
+    console.log('showRegisterModal called');
+    if (window.localAuthManager) {
+        window.localAuthManager.showRegisterModal();
+    } else {
+        console.error('localAuthManager not available');
+    }
+};
+
+window.logout = async function() {
+    console.log('logout called');
+    if (window.authManager) {
+        const result = await window.authManager.signOut();
+        console.log('Logout result:', result);
+    } else {
+        console.error('AuthManager not available');
+    }
+};
+
+console.log('Global functions defined:', {
+    showLoginModal: typeof window.showLoginModal,
+    showRegisterModal: typeof window.showRegisterModal,
+    logout: typeof window.logout
+});
 
 // Global variables
 let loginModal, registerModal;
+let mainAppLogger; // Renamed to avoid conflicts with global logger
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    logger.info('Application initialized');
+    // Initialize logger after DOM is ready
+    mainAppLogger = new Logger('MainApp');
+    mainAppLogger.info('Application initialized');
     initializeApp();
 });
 
@@ -25,7 +61,7 @@ function initializeApp() {
     initializeUIComponents();
     
     // Log application start
-    logger.logSystemEvent('APPLICATION_STARTED', {
+    mainAppLogger.logSystemEvent('APPLICATION_STARTED', {
         timestamp: new Date().toISOString(),
         userAgent: navigator.userAgent,
         viewport: {
@@ -42,8 +78,8 @@ function initializeModals() {
 }
 
 function initializeFormHandlers() {
-    // Form handlers are now handled by Clerk
-    logger.info('Form handlers initialized - using Clerk authentication');
+    // Form handlers are now handled by localStorage authentication
+    mainAppLogger.info('Form handlers initialized - using localStorage authentication');
 }
 
 function initializeUIComponents() {
@@ -101,7 +137,7 @@ function handleRoleChange(event) {
         document.getElementById('program').required = false;
     }
     
-    logger.logUserAction('ROLE_SELECTED', { role });
+    mainAppLogger.logUserAction('ROLE_SELECTED', { role });
 }
 
 // Handle login form submission
@@ -115,7 +151,7 @@ async function handleLogin(event) {
         role: formData.get('role') || document.getElementById('loginRole').value
     };
     
-    logger.logUserAction('LOGIN_ATTEMPT', { email: loginData.email, role: loginData.role });
+    mainAppLogger.logUserAction('LOGIN_ATTEMPT', { email: loginData.email, role: loginData.role });
     
     // Validate form data
     if (!loginData.email || !loginData.password || !loginData.role) {
@@ -129,9 +165,9 @@ async function handleLogin(event) {
     
     if (result.success) {
         loginModal.hide();
-        logger.logUserAction('LOGIN_SUCCESS', { email: loginData.email, role: loginData.role });
+        mainAppLogger.logUserAction('LOGIN_SUCCESS', { email: loginData.email, role: loginData.role });
     } else {
-        logger.logUserAction('LOGIN_FAILED', { email: loginData.email, role: loginData.role, error: result.error });
+        mainAppLogger.logUserAction('LOGIN_FAILED', { email: loginData.email, role: loginData.role, error: result.error });
     }
     
     resetSubmitButton(event.target);
@@ -158,7 +194,7 @@ async function handleRegister(event) {
         registerData.subject = document.getElementById('subject').value;
     }
     
-    logger.logUserAction('REGISTER_ATTEMPT', { email: registerData.email, role: registerData.role });
+    mainAppLogger.logUserAction('REGISTER_ATTEMPT', { email: registerData.email, role: registerData.role });
     
     // Validate form data
     if (!registerData.name || !registerData.email || !registerData.password || !registerData.role) {
@@ -184,9 +220,9 @@ async function handleRegister(event) {
         } else {
             showNotification('Registration successful! You can now log in.', 'success');
         }
-        logger.logUserAction('REGISTER_SUCCESS', { email: registerData.email, role: registerData.role });
+        mainAppLogger.logUserAction('REGISTER_SUCCESS', { email: registerData.email, role: registerData.role });
     } else {
-        logger.logUserAction('REGISTER_FAILED', { email: registerData.email, role: registerData.role, error: result.error });
+        mainAppLogger.logUserAction('REGISTER_FAILED', { email: registerData.email, role: registerData.role, error: result.error });
     }
     
     resetSubmitButton(event.target);
@@ -226,34 +262,19 @@ function showNotification(message, type = 'info') {
         }
     }, 5000);
     
-    logger.logSystemEvent('NOTIFICATION_SHOWN', { message, type });
+    mainAppLogger.logSystemEvent('NOTIFICATION_SHOWN', { message, type });
 }
-
-// Global functions for modal control
-window.showLoginModal = function() {
-    logger.logUserAction('LOGIN_MODAL_OPENED');
-    ClerkUtils.openSignIn();
-};
-
-window.showRegisterModal = function() {
-    logger.logUserAction('REGISTER_MODAL_OPENED');
-    ClerkUtils.openSignUp();
-};
-
-// Global logout function
-window.logout = async function() {
-    const result = await authManager.signOut();
-    if (result.success) {
-        logger.logUserAction('LOGOUT_SUCCESS');
-    }
-};
 
 // Performance monitoring
 function monitorPerformance() {
     // Monitor page load time
     window.addEventListener('load', () => {
         const loadTime = performance.now();
-        logger.info('Page loaded', { loadTime: `${loadTime.toFixed(2)}ms` });
+        if (mainAppLogger) {
+            mainAppLogger.info('Page loaded', { loadTime: `${loadTime.toFixed(2)}ms` });
+        } else {
+            console.log('Page loaded', { loadTime: `${loadTime.toFixed(2)}ms` });
+        }
     });
     
     // Monitor navigation timing
@@ -265,15 +286,20 @@ function monitorPerformance() {
             2: 'back_forward'
         };
         
-        logger.info('Navigation type', { type: navTypes[navType] || 'unknown' });
+        if (mainAppLogger) {
+            mainAppLogger.info('Navigation type', { type: navTypes[navType] || 'unknown' });
+        } else {
+            console.log('Navigation type', { type: navTypes[navType] || 'unknown' });
+        }
     }
 }
 
-// Initialize performance monitoring
-monitorPerformance();
+// Initialize performance monitoring only after DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    monitorPerformance();
+});
 
-// Export functions for use in other modules
-export {
-    showNotification,
-    logger
-};
+// Make functions available globally
+if (typeof window !== 'undefined') {
+    window.showNotification = showNotification;
+}

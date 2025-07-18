@@ -354,6 +354,8 @@ class Logger {
 // Create global logger instance
 const logger = new Logger('Application');
 
-// Export both the class and instance
-export { Logger, logger };
-export default Logger;
+// Make Logger available globally for browser usage
+if (typeof window !== 'undefined') {
+    window.Logger = Logger;
+    window.logger = logger;
+}
