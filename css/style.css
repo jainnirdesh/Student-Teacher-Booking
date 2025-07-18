@@ -137,111 +137,9 @@ body {
     background: rgba(148, 163, 184, 0.5);
 }
 
-.sidebar.collapsed {
-    width: 80px !important;
-}
 
-.sidebar.collapsed .sidebar-brand-text,
-.sidebar.collapsed .nav-text,
-.sidebar.collapsed .sidebar-footer-text {
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(-10px);
-}
 
-.sidebar.collapsed .sidebar-nav-link {
-    justify-content: center;
-    padding: 1rem 0.5rem;
-    position: relative;
-}
 
-.sidebar.collapsed .sidebar-nav-link::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    left: calc(100% + 20px);
-    top: 50%;
-    transform: translateY(-50%);
-    background: #1e293b;
-    color: white;
-    padding: 10px 15px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 2000;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
-    min-width: 100px;
-    text-align: center;
-    pointer-events: none;
-}
-
-.sidebar.collapsed .sidebar-nav-link::before {
-    content: '';
-    position: absolute;
-    left: calc(100% + 14px);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 0;
-    height: 0;
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-right: 8px solid #1e293b;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    z-index: 2000;
-    pointer-events: none;
-}
-
-.sidebar.collapsed .sidebar-nav-link:hover::after,
-.sidebar.collapsed .sidebar-nav-link:hover::before {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Enhanced Icon Visibility */
-.sidebar.collapsed .sidebar-nav-link i {
-    font-size: 1.3rem;
-    color: var(--secondary-color);
-    transition: all 0.3s ease;
-}
-
-.sidebar.collapsed .sidebar-nav-link:hover i {
-    color: var(--primary-color);
-    transform: scale(1.1);
-}
-
-.sidebar.collapsed .sidebar-nav-link.active i {
-    color: white;
-    transform: scale(1.1);
-}
-
-/* Better Visual Feedback for Active State */
-.sidebar.collapsed .sidebar-nav-link.active {
-    background: linear-gradient(135deg, var(--primary-color), #1e40af);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-}
-
-/* Improved Toggle Button */
-.sidebar-toggle {
-    background: rgba(37, 99, 235, 0.1) !important;
-    border: 1px solid rgba(37, 99, 235, 0.3) !important;
-    color: var(--primary-color) !important;
-    padding: 8px !important;
-    border-radius: 8px !important;
-    font-size: 16px !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-}
-
-.sidebar-toggle:hover {
-    background: var(--primary-color) !important;
-    color: white !important;
-    transform: scale(1.1) !important;
-}
 
 /* Sidebar Header */
 .sidebar-header {
@@ -287,21 +185,7 @@ body {
     color: var(--primary-color);
 }
 
-.sidebar-toggle {
-    background: none;
-    border: none;
-    color: var(--secondary-color);
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0.5rem;
-    border-radius: 6px;
-    transition: all 0.2s ease;
-}
 
-.sidebar-toggle:hover {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary-color);
-}
 
 /* Navigation Styles */
 .sidebar-nav {
@@ -934,7 +818,6 @@ body {
 
 /* Focus states for accessibility */
 .sidebar-nav-link:focus,
-.sidebar-toggle:focus,
 .mobile-menu-btn:focus {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
@@ -1024,8 +907,7 @@ body {
     .mobile-menu-btn,
     .btn,
     .modal,
-    .loading-overlay,
-    .sidebar-toggle {
+    .loading-overlay {
         display: none !important;
     }
     
@@ -1052,47 +934,7 @@ body {
     }
 }
 
-/* Expand Hint for Collapsed Sidebar */
-.sidebar.collapsed::before {
-    content: '';
-    position: absolute;
-    right: -3px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 6px;
-    height: 40px;
-    background: linear-gradient(135deg, var(--primary-color), #1e40af);
-    border-radius: 0 3px 3px 0;
-    opacity: 0.3;
-    animation: expandHint 3s ease-in-out infinite;
-}
 
-@keyframes expandHint {
-    0%, 100% {
-        opacity: 0.3;
-        transform: translateY(-50%) translateX(0);
-    }
-    50% {
-        opacity: 0.8;
-        transform: translateY(-50%) translateX(2px);
-    }
-}
-
-.sidebar.collapsed:hover::before {
-    opacity: 0.8;
-    animation: none;
-}
-
-/* Better Hover State for Collapsed Toggle */
-.sidebar.collapsed .sidebar-toggle {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
-}
-
-.sidebar.collapsed .sidebar-toggle:hover {
-    transform: scale(1.15);
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
-}
 
 /* Simplified Professional Sidebar - Always Expanded */
 .sidebar {
