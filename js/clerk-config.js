@@ -1,5 +1,5 @@
 // Clerk configuration and initialization
-import { Clerk } from '@clerk/clerk-js';
+// Remove ES6 import since we're loading Clerk from CDN
 
 // Clerk configuration
 const clerkConfig = {
@@ -20,41 +20,50 @@ const clerkConfig = {
 
 // Initialize Clerk
 let clerk;
-if (typeof window !== 'undefined') {
-  clerk = new Clerk(clerkConfig.publishableKey);
+if (typeof window !== 'undefined' && window.Clerk) {
+  clerk = new window.Clerk(clerkConfig.publishableKey);
   
   // Load Clerk
   clerk.load().then(() => {
     console.log('Clerk loaded successfully');
+    // Make clerk available globally
+    window.clerk = clerk;
   }).catch((error) => {
     console.error('Error loading Clerk:', error);
   });
+} else {
+  console.warn('Clerk not available on window object');
 }
 
-// Export Clerk instance
-export { clerk };
+// Export Clerk instance (make it globally available)
+if (typeof window !== 'undefined') {
+  window.clerk = clerk;
+}
 
 // Utility functions for Clerk integration
-export const ClerkUtils = {
+const ClerkUtils = {
   // Get current user
   getCurrentUser: () => {
-    return clerk?.user || null;
+    return window.clerk?.user || null;
   },
 
   // Check if user is signed in
   isSignedIn: () => {
-    return clerk?.user !== null;
+    return window.clerk?.user !== null;
   },
 
   // Get user role from metadata
   getUserRole: () => {
+    const user = window.clerk?.user;
+    return user?.publicMetadata?.role || user?.privateMetadata?.role || 'student';
+  },
     const user = clerk?.user;
     return user?.publicMetadata?.role || user?.privateMetadata?.role || 'student';
   },
 
   // Get user profile data
   getUserProfile: () => {
-    const user = clerk?.user;
+    const user = window.clerk?.user;
     if (!user) return null;
 
     return {
@@ -74,7 +83,7 @@ export const ClerkUtils = {
   // Sign out user
   signOut: async () => {
     try {
-      await clerk?.signOut();
+      await window.clerk?.signOut();
       window.location.href = 'index.html';
     } catch (error) {
       console.error('Error signing out:', error);
@@ -84,23 +93,23 @@ export const ClerkUtils = {
 
   // Open sign in modal
   openSignIn: () => {
-    clerk?.openSignIn();
+    window.clerk?.openSignIn();
   },
 
   // Open sign up modal
   openSignUp: () => {
-    clerk?.openSignUp();
+    window.clerk?.openSignUp();
   },
 
   // Open user profile modal
   openUserProfile: () => {
-    clerk?.openUserProfile();
+    window.clerk?.openUserProfile();
   },
 
   // Update user metadata
   updateUserMetadata: async (metadata) => {
     try {
-      const user = clerk?.user;
+      const user = window.clerk?.user;
       if (!user) throw new Error('No user signed in');
       
       await user.update({
@@ -112,6 +121,11 @@ export const ClerkUtils = {
     }
   }
 };
+
+// Make ClerkUtils available globally
+if (typeof window !== 'undefined') {
+  window.ClerkUtils = ClerkUtils;
+}
 
 // Authentication event listeners
 if (typeof window !== 'undefined') {
@@ -128,9 +142,9 @@ if (typeof window !== 'undefined') {
   };
 
   // Set up auth state listener when Clerk loads
-  if (clerk) {
-    clerk.addListener(handleAuthChange);
-  }
+  setTimeout(() => {
+    if (window.clerk) {
+      window.clerk.addListener(handleAuthChange);
+    }
+  }, 1000);
 }
-
-export default clerk;

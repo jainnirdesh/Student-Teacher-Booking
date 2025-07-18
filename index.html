@@ -136,10 +136,14 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
     <!-- Clerk JS SDK -->
-    <script type="module" src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.umd.js"></script>
-    <script type="module" src="js/clerk-config.js"></script>
-    <script type="module" src="js/auth.js"></script>
-    <script type="module" src="js/main.js"></script>
+    <script src="https://unpkg.com/@clerk/clerk-js@latest/dist/clerk.browser.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/logger.js"></script>
+    <script src="js/clerk-config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
