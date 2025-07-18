@@ -53,7 +53,7 @@ function showSection(sectionName) {
     }
 }
 
-// Professional Sidebar Management
+// Professional Sidebar Management with Safari Support
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
@@ -72,15 +72,41 @@ function toggleSidebar() {
     } else {
         // Desktop behavior
         if (sidebar && mainContent) {
-            sidebar.classList.toggle('collapsed');
-            mainContent.classList.toggle('expanded');
-            
-            // Store sidebar state in localStorage
             const isCollapsed = sidebar.classList.contains('collapsed');
-            localStorage.setItem('sidebarCollapsed', isCollapsed.toString());
             
-            // Update toggle button icon
+            if (isCollapsed) {
+                // Expand sidebar
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('expanded');
+                
+                // Safari-specific adjustments
+                if (isSafari()) {
+                    setTimeout(() => {
+                        sidebar.style.width = '300px';
+                        mainContent.style.marginLeft = '300px';
+                    }, 50);
+                }
+                
+                localStorage.setItem('sidebarCollapsed', 'false');
+            } else {
+                // Collapse sidebar
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+                
+                // Safari-specific adjustments
+                if (isSafari()) {
+                    setTimeout(() => {
+                        sidebar.style.width = '80px';
+                        mainContent.style.marginLeft = '80px';
+                    }, 50);
+                }
+                
+                localStorage.setItem('sidebarCollapsed', 'true');
+            }
+            
+            // Update visual indicators
             updateSidebarToggleIcon();
+            addExpandIndicator();
         }
     }
 }
@@ -113,15 +139,32 @@ function initializeSidebar() {
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
     
-    // Only apply collapsed state if user explicitly chose it and on desktop
-    if (isCollapsed && window.innerWidth > 768) {
-        sidebar?.classList.add('collapsed');
-        mainContent?.classList.add('expanded');
-    } else {
-        // Ensure sidebar is expanded by default
-        sidebar?.classList.remove('collapsed');
-        mainContent?.classList.remove('expanded');
-        localStorage.setItem('sidebarCollapsed', 'false');
+    // Apply saved state if on desktop
+    if (window.innerWidth > 768) {
+        if (isCollapsed) {
+            sidebar?.classList.add('collapsed');
+            mainContent?.classList.add('expanded');
+            
+            // Safari-specific handling
+            if (isSafari()) {
+                setTimeout(() => {
+                    if (sidebar) sidebar.style.width = '80px';
+                    if (mainContent) mainContent.style.marginLeft = '80px';
+                }, 50);
+            }
+        } else {
+            sidebar?.classList.remove('collapsed');
+            mainContent?.classList.remove('expanded');
+            localStorage.setItem('sidebarCollapsed', 'false');
+            
+            // Safari-specific handling
+            if (isSafari()) {
+                setTimeout(() => {
+                    if (sidebar) sidebar.style.width = '300px';
+                    if (mainContent) mainContent.style.marginLeft = '300px';
+                }, 50);
+            }
+        }
     }
     
     // Update visual indicators
@@ -282,14 +325,17 @@ async function initializeDashboard() {
         
         // Initialize professional sidebar
         resetSidebarState(); // Reset to expanded state
+        forceExpandSidebar(); // Force full expansion
+        ensureSafariCompatibility(); // Ensure Safari works
         initializeSidebar();
         
-        // Safari compatibility fixes
+        // Additional compatibility checks
         setTimeout(() => {
-            debugSidebarState();
-            forceSidebarVisibility();
-            ensureSidebarExpanded();
-        }, 200);
+            forceExpandSidebar(); // Force again after delay
+            if (isSafari()) {
+                ensureSafariCompatibility();
+            }
+        }, 300);
         
         // Load user profile
         console.log('Loading user profile...');
@@ -1267,8 +1313,8 @@ document.addEventListener('DOMContentLoaded', ensureSidebarExpanded);
 
 // Clear any problematic localStorage and ensure expanded state
 function resetSidebarState() {
-    // Clear the collapsed state to start fresh
-    localStorage.removeItem('sidebarCollapsed');
+    // Force expanded state by default
+    localStorage.setItem('sidebarCollapsed', 'false');
     
     // Ensure sidebar is expanded
     const sidebar = document.getElementById('sidebar');
@@ -1277,14 +1323,54 @@ function resetSidebarState() {
     if (sidebar && window.innerWidth > 768) {
         sidebar.classList.remove('collapsed');
         mainContent?.classList.remove('expanded');
-        localStorage.setItem('sidebarCollapsed', 'false');
         
-        console.log('Sidebar reset to expanded state');
+        // Force styles for Safari
+        if (isSafari()) {
+            sidebar.style.width = '300px';
+            if (mainContent) mainContent.style.marginLeft = '300px';
+        }
+        
+        console.log('Sidebar forced to expanded state');
     }
 }
 
 // Make function available globally
 window.resetSidebarState = resetSidebarState;
+
+// Force sidebar to be fully expanded and functional
+function forceExpandSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    
+    if (sidebar && window.innerWidth > 768) {
+        // Remove collapsed state
+        sidebar.classList.remove('collapsed');
+        mainContent?.classList.remove('expanded');
+        
+        // Force expanded styles
+        sidebar.style.width = '300px';
+        sidebar.style.transform = 'translateX(0)';
+        if (mainContent) {
+            mainContent.style.marginLeft = '300px';
+        }
+        
+        // Update localStorage
+        localStorage.setItem('sidebarCollapsed', 'false');
+        
+        // Make toggle button more visible
+        const toggleBtn = sidebar.querySelector('.sidebar-toggle');
+        if (toggleBtn) {
+            toggleBtn.style.display = 'block';
+            toggleBtn.style.visibility = 'visible';
+            toggleBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+        }
+        
+        console.log('Sidebar forced to expanded state with full functionality');
+    }
+}
+
+// Call forceExpandSidebar on initial load
+document.addEventListener('DOMContentLoaded', forceExpandSidebar);
 
 // Safari debugging and compatibility fixes
 function debugSidebarState() {
@@ -1352,35 +1438,39 @@ function isSafari() {
     return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 }
 
-function applySafariSpecificFixes() {
+// Safari detection and compatibility
+function isSafari() {
+    return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+}
+
+function ensureSafariCompatibility() {
     if (isSafari()) {
-        console.log('Safari detected, applying specific fixes...');
+        console.log('Safari detected, ensuring base compatibility...');
         
-        // Add Safari-specific class to body
-        document.body.classList.add('safari-browser');
-        
-        // Force sidebar visibility with inline styles
         const sidebar = document.getElementById('sidebar');
-        if (sidebar) {
-            sidebar.style.setProperty('display', 'block', 'important');
-            sidebar.style.setProperty('position', 'fixed', 'important');
-            sidebar.style.setProperty('left', '0', 'important');
-            sidebar.style.setProperty('top', '0', 'important');
-            sidebar.style.setProperty('width', '300px', 'important');
-            sidebar.style.setProperty('height', '100vh', 'important');
-            sidebar.style.setProperty('z-index', '1050', 'important');
-            sidebar.style.setProperty('background', 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)', 'important');
-            sidebar.style.setProperty('box-shadow', '0 8px 32px rgba(0, 0, 0, 0.08)', 'important');
-            sidebar.style.setProperty('border-right', '1px solid rgba(226, 232, 240, 0.6)', 'important');
-        }
-        
-        // Ensure main content has proper margin
         const mainContent = document.getElementById('mainContent');
-        if (mainContent) {
-            mainContent.style.setProperty('margin-left', '300px', 'important');
+        
+        if (sidebar) {
+            // Ensure basic visibility without preventing collapse functionality
+            sidebar.style.position = 'fixed';
+            sidebar.style.top = '0';
+            sidebar.style.left = '0';
+            sidebar.style.height = '100vh';
+            sidebar.style.zIndex = '1050';
+            sidebar.style.display = 'block';
+            sidebar.style.visibility = 'visible';
+            sidebar.style.opacity = '1';
+            
+            // Only set width and margin if not collapsed
+            if (!sidebar.classList.contains('collapsed')) {
+                sidebar.style.width = '300px';
+                if (mainContent) {
+                    mainContent.style.marginLeft = '300px';
+                }
+            }
         }
         
-        console.log('Safari fixes applied');
+        console.log('Safari compatibility ensured');
     }
 }
 
